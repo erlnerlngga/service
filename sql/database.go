@@ -111,3 +111,7 @@ func (d *Database) getMigrations() fs.FS {
 	}
 	return fsys
 }
+
+func (d *Database) Ping(ctx context.Context) error {
+	return d.DB.PingContext(ctx)
+}

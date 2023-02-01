@@ -2,21 +2,20 @@ package http
 
 import (
 	"context"
+	"log"
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi/v5"
-
-	"github.com/maragudk/service/model"
 )
 
-type jobCreator interface {
-	CreateJob(ctx context.Context, name string, payload model.Map, timeout time.Duration) error
+type pinger interface {
+	Ping(ctx context.Context) error
 }
 
-func Health(mux chi.Router, db jobCreator) {
+func Health(mux chi.Router, db pinger, log *log.Logger) {
 	mux.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		if err := db.CreateJob(r.Context(), "health", model.Map{}, time.Second); err != nil {
+		if err := db.Ping(r.Context()); err != nil {
+			log.Println("Error in health check:", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
