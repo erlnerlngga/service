@@ -123,6 +123,9 @@ func (s *Sender) send(ctx context.Context, typ emailType, to nameAndEmail, subje
 		messageStream = transactionalMessageStream
 	}
 
+	// Keywords that are always included
+	keywords["baseURL"] = s.baseURL
+
 	err := s.sendRequest(ctx, requestBody{
 		MessageStream: messageStream,
 		From:          from,
@@ -221,14 +224,15 @@ func getEmail(path, preheader string, keywords keywords) string {
 	email := string(layout)
 	email = strings.ReplaceAll(email, "{{preheader}}", preheader)
 	email = strings.ReplaceAll(email, "{{body}}", string(emailBody))
-	for keyword, replacement := range keywords {
-		email = strings.ReplaceAll(email, "{{"+keyword+"}}", replacement)
-	}
 
 	if _, ok := keywords["unsubscribe"]; ok {
 		email = strings.ReplaceAll(email, "{{unsubscribe}}", "{{{ pm:unsubscribe }}}")
 	} else {
 		email = strings.ReplaceAll(email, "{{unsubscribe}}", "")
+	}
+
+	for keyword, replacement := range keywords {
+		email = strings.ReplaceAll(email, "{{"+keyword+"}}", replacement)
 	}
 
 	return email
