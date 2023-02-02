@@ -40,7 +40,7 @@ func page(p PageProps, body ...g.Node) g.Node {
 			favIcons(),
 			openGraph(p.Title, p.Description, "/images/logo.png", ""),
 		},
-		Body: []g.Node{Class("h-full bg-gray-50 dark:bg-gray-900"),
+		Body: []g.Node{Class("h-full bg-gray-50"),
 			navbar(p),
 			container(true,
 				g.Group(body),
@@ -73,7 +73,7 @@ func container(padY bool, children ...g.Node) g.Node {
 }
 
 func prose(children ...g.Node) g.Node {
-	return Div(Class("prose prose-lg lg:prose-xl xl:prose-2xl dark:prose-invert"), g.Group(children))
+	return Div(Class("prose prose-lg lg:prose-xl xl:prose-2xl"), g.Group(children))
 }
 
 func card(children ...g.Node) g.Node {
