@@ -55,7 +55,7 @@ func navbar(p PageProps) g.Node {
 			Div(Class("flex justify-between py-2"),
 				A(Href("/"), g.Text(`Home`)),
 				g.If(p.User == nil,
-					A(Href("/signup"), g.Text(`Signup`)),
+					A(Href("/signup"), g.Text(`Sign up`)),
 				),
 			),
 		),
@@ -85,7 +85,7 @@ func h1(children ...g.Node) g.Node {
 }
 
 func a(children ...g.Node) g.Node {
-	return A(Class("font-medium text-emerald-600 hover:text-emerald-500"), g.Group(children))
+	return A(Class("font-medium text-cyan-600 hover:text-cyan-500"), g.Group(children))
 }
 
 func label(id, text string) g.Node {
@@ -93,11 +93,11 @@ func label(id, text string) g.Node {
 }
 
 func input(children ...g.Node) g.Node {
-	return Input(Class("block w-full rounded-md border border-gray-300 focus:border-emerald-500 px-3 py-2 placeholder-gray-400 shadow-sm sm:text-sm text-gray-900"), g.Group(children))
+	return Input(Class("block w-full rounded-md border border-gray-300 focus:border-cyan-500 px-3 py-2 placeholder-gray-400 shadow-sm sm:text-sm text-gray-900 focus:ring-cyan-500"), g.Group(children))
 }
 
 func button(children ...g.Node) g.Node {
-	return Button(Class("block w-full rounded-md bg-emerald-600 hover:bg-emerald-700 px-4 py-2 font-medium text-white"), g.Group(children))
+	return Button(Class("block w-full rounded-md bg-cyan-600 hover:bg-cyan-700 px-4 py-2 font-medium text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"), g.Group(children))
 }
 
 const themeColor = "#ffffff"

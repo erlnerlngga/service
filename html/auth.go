@@ -28,7 +28,7 @@ func SignupPage(p PageProps) g.Node {
 					),
 
 					Div(Class("flex items-center space-x-2"),
-						Input(ID("accept"), Name("accept"), Type("checkbox"), Required(), Class("h-4 w-4 rounded border-gray-300 text-emerald-600")),
+						Input(ID("accept"), Name("accept"), Type("checkbox"), Required(), Class("h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500")),
 						Label(For("accept"), Class("text-gray-900"),
 							g.Text(`I accept the `),
 							a(Href("/legal/terms-of-service"), Target("_blank"), g.Text(`Terms of Service`)),
