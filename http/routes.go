@@ -32,6 +32,7 @@ func (s *Server) setupRoutes() {
 			Logout(r, s.sm, s.log)
 
 			Home(r)
+			Legal(r)
 			NotFound(r)
 		})
 

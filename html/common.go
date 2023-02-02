@@ -76,6 +76,10 @@ func prose(children ...g.Node) g.Node {
 	return Div(Class("prose prose-lg lg:prose-xl xl:prose-2xl"), g.Group(children))
 }
 
+func smallProse(children ...g.Node) g.Node {
+	return Div(Class("prose prose-sm"), g.Group(children))
+}
+
 func card(children ...g.Node) g.Node {
 	return Div(Class("bg-white py-8 px-4 shadow rounded-lg sm:px-10"), g.Group(children))
 }
