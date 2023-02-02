@@ -110,6 +110,7 @@ func start() int {
 		Metrics:       registry,
 		ObjectStore:   objectStore,
 		Port:          env.GetIntOrDefault("PORT", 8080),
+		SecureCookie:  env.GetBoolOrDefault("SECURE_COOKIE", true),
 	})
 
 	runner := jobs.NewRunner(jobs.NewRunnerOptions{

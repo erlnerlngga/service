@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/alexedwards/scs/sqlite3store"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -26,6 +28,7 @@ type Server struct {
 	mux           chi.Router
 	objectStore   *s3.ObjectStore
 	server        *http.Server
+	sm            *scs.SessionManager
 }
 
 type NewServerOptions struct {
@@ -36,6 +39,7 @@ type NewServerOptions struct {
 	Metrics       *prometheus.Registry
 	ObjectStore   *s3.ObjectStore
 	Port          int
+	SecureCookie  bool
 }
 
 // NewServer returns an initialized, but unstarted Server.
@@ -51,6 +55,11 @@ func NewServer(opts NewServerOptions) *Server {
 
 	address := net.JoinHostPort(opts.Host, strconv.Itoa(opts.Port))
 	mux := chi.NewMux()
+
+	sm := scs.New()
+	sm.Store = sqlite3store.New(opts.Database.DB.DB)
+	sm.Lifetime = 365 * 24 * time.Hour
+	sm.Cookie.Secure = opts.SecureCookie
 
 	return &Server{
 		address:       address,
@@ -69,6 +78,7 @@ func NewServer(opts NewServerOptions) *Server {
 			WriteTimeout:      5 * time.Second,
 			IdleTimeout:       5 * time.Second,
 		},
+		sm: sm,
 	}
 }
 

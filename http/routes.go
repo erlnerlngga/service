@@ -24,6 +24,9 @@ func (s *Server) setupRoutes() {
 
 		r.Group(func(r chi.Router) {
 			r.Use(middleware.SetHeader("Content-Type", "text/html; charset=utf-8"))
+			r.Use(s.sm.LoadAndSave)
+
+			Logout(r, s.sm, s.log)
 
 			Home(r)
 			NotFound(r)

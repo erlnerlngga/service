@@ -3,6 +3,8 @@ module github.com/maragudk/service
 go 1.19
 
 require (
+	github.com/alexedwards/scs/sqlite3store v0.0.0-20230201054056-1257cb2752e3
+	github.com/alexedwards/scs/v2 v2.5.0
 	github.com/aws/aws-sdk-go-v2 v1.17.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.3
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.29.4
