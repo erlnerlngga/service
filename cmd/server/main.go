@@ -103,12 +103,13 @@ func start() int {
 	})
 
 	s := http.NewServer(http.NewServerOptions{
-		Database:    db,
-		Host:        env.GetStringOrDefault("HOST", ""),
-		Log:         log,
-		Metrics:     registry,
-		ObjectStore: objectStore,
-		Port:        env.GetIntOrDefault("PORT", 8080),
+		AdminPassword: env.GetStringOrDefault("ADMIN_PASSWORD", "08f439unf398nf92oiwfoif3oiewifmowe"),
+		Database:      db,
+		Host:          env.GetStringOrDefault("HOST", ""),
+		Log:           log,
+		Metrics:       registry,
+		ObjectStore:   objectStore,
+		Port:          env.GetIntOrDefault("PORT", 8080),
 	})
 
 	runner := jobs.NewRunner(jobs.NewRunnerOptions{
