@@ -2,61 +2,36 @@ package http
 
 import (
 	"net/http"
-	"regexp"
-	"strconv"
-	"time"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // Middleware is an alias for a function that takes a handler and returns one, too.
 type Middleware = func(http.Handler) http.Handler
 
-func AddMetrics(registry *prometheus.Registry) Middleware {
-	requests := promauto.With(registry).NewCounterVec(prometheus.CounterOpts{
-		Name: "app_http_requests_total",
-		Help: "The total number of HTTP requests.",
-	}, []string{"method", "path", "code"})
-
-	requestLatencies := promauto.With(registry).NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "app_http_request_duration_seconds",
-		Help:    "HTTP request durations.",
-		Buckets: []float64{.005, .01, .05, .1, .5, 1},
-	}, []string{"code"})
-
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ww := middleware.NewWrapResponseWriter(w, 1)
-			before := time.Now()
-			next.ServeHTTP(ww, r)
-			duration := time.Since(before)
-			status := ww.Status()
-			if status == 0 {
-				status = http.StatusOK
-			}
-			code := strconv.Itoa(status)
-			requests.WithLabelValues(r.Method, r.URL.Path, code).Inc()
-			requestLatencies.WithLabelValues(code).Observe(duration.Seconds())
-		})
-	}
-}
-
-func Metrics(mux chi.Router, registry *prometheus.Registry) {
-	mux.Get("/metrics", promhttp.HandlerFor(registry, promhttp.HandlerOpts{}).ServeHTTP)
-}
-
-var versionedAssetMatcher = regexp.MustCompile(`([^.]+)\.[a-z0-9]+(\.(?:js|css))`)
-
-func VersionedAssets(next http.Handler) http.Handler {
+// NoClickjacking middleware sets headers to disallow frame embedding and XSS protection for older browsers.
+// See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+// See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
+func NoClickjacking(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if versionedAssetMatcher.MatchString(r.URL.Path) {
-			r.URL.Path = versionedAssetMatcher.ReplaceAllString(r.URL.Path, `$1$2`)
-		}
+		w.Header().Set("X-Frame-Options", "deny")
+		w.Header().Set("X-XSS-Protection", "1; mode=block")
+		next.ServeHTTP(w, r)
+	})
+}
 
+// StrictContentSecurityPolicy sets best practice CSP headers.
+// This disallows all external img, script, and style links, and disallows all objects (flash etc.).
+// See https://infosec.mozilla.org/guidelines/web_security#content-security-policy
+func StrictContentSecurityPolicy(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Security-Policy",
+			"default-src 'none'; "+
+				"connect-src 'self'; "+
+				"font-src 'self'; "+
+				"img-src 'self'; "+
+				"manifest-src 'self'; "+
+				"media-src 'self'; "+
+				"script-src 'self'; "+
+				"style-src 'self';")
 		next.ServeHTTP(w, r)
 	})
 }

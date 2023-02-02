@@ -23,6 +23,7 @@ func (s *Server) setupRoutes() {
 		})
 
 		r.Group(func(r chi.Router) {
+			r.Use(NoClickjacking, StrictContentSecurityPolicy)
 			r.Use(middleware.SetHeader("Content-Type", "text/html; charset=utf-8"))
 			r.Use(s.sm.LoadAndSave)
 
