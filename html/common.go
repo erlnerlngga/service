@@ -11,26 +11,14 @@ import (
 	g "github.com/maragudk/gomponents"
 	c "github.com/maragudk/gomponents/components"
 	. "github.com/maragudk/gomponents/html"
+
+	"github.com/maragudk/service/model"
 )
 
 type PageProps struct {
 	Title       string
 	Description string
-}
-
-func ErrorPage() g.Node {
-	return page(PageProps{Title: "Something went wrong", Description: "Oh no! 😵"},
-		H1(g.Text("Something went wrong")),
-		P(g.Text("Oh no! 😵")),
-		P(A(Href("/"), g.Text("Back to front."))),
-	)
-}
-
-func NotFoundPage() g.Node {
-	return page(PageProps{Title: "There's nothing here!", Description: "Just the void."},
-		H1(g.Text("There's nothing here!")),
-		P(A(Href("/"), g.Text("Back to front."))),
-	)
+	User        *model.User
 }
 
 var hashOnce sync.Once
@@ -52,14 +40,26 @@ func page(p PageProps, body ...g.Node) g.Node {
 			favIcons(),
 			openGraph(p.Title, p.Description, "/images/logo.png", ""),
 		},
-		Body: []g.Node{Class("dark:bg-gray-900"),
+		Body: []g.Node{Class("h-full bg-gray-50 dark:bg-gray-900"),
+			navbar(p),
 			container(true,
-				prose(
-					g.Group(body),
-				),
+				g.Group(body),
 			),
 		},
 	})
+}
+
+func navbar(p PageProps) g.Node {
+	return Div(
+		container(false,
+			Div(Class("flex justify-between py-2"),
+				A(Href("/"), g.Text(`Home`)),
+				g.If(p.User == nil,
+					A(Href("/signup"), g.Text(`Signup`)),
+				),
+			),
+		),
+	)
 }
 
 func container(padY bool, children ...g.Node) g.Node {
@@ -74,6 +74,30 @@ func container(padY bool, children ...g.Node) g.Node {
 
 func prose(children ...g.Node) g.Node {
 	return Div(Class("prose prose-lg lg:prose-xl xl:prose-2xl dark:prose-invert"), g.Group(children))
+}
+
+func card(children ...g.Node) g.Node {
+	return Div(Class("bg-white py-8 px-4 shadow rounded-lg sm:px-10"), g.Group(children))
+}
+
+func h1(children ...g.Node) g.Node {
+	return H1(Class("font-medium text-gray-900 text-xl"), g.Group(children))
+}
+
+func a(children ...g.Node) g.Node {
+	return A(Class("font-medium text-emerald-600 hover:text-emerald-500"), g.Group(children))
+}
+
+func label(id, text string) g.Node {
+	return Label(For(id), Class("block text-sm text-gray-700 mb-1"), g.Text(text))
+}
+
+func input(children ...g.Node) g.Node {
+	return Input(Class("block w-full rounded-md border border-gray-300 focus:border-emerald-500 px-3 py-2 placeholder-gray-400 shadow-sm sm:text-sm text-gray-900"), g.Group(children))
+}
+
+func button(children ...g.Node) g.Node {
+	return Button(Class("block w-full rounded-md bg-emerald-600 hover:bg-emerald-700 px-4 py-2 font-medium text-white"), g.Group(children))
 }
 
 const themeColor = "#ffffff"

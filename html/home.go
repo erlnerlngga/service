@@ -2,7 +2,6 @@ package html
 
 import (
 	g "github.com/maragudk/gomponents"
-	"github.com/maragudk/gomponents-heroicons/v2/solid"
 	. "github.com/maragudk/gomponents/html"
 )
 
@@ -11,12 +10,10 @@ func HomePage(p PageProps) g.Node {
 	p.Description = "This is a service."
 
 	return page(p,
-		Div(Class("prose-headings:font-serif"),
-			H1(Class("inline-flex items-center"), solid.Sparkles(Class("h-12 w-12 mr-2")), g.Text(`Service`)),
+		H1(Class("text-2xl font-bold text-gray-900 sm:text-4xl"), g.Text(`This is a Service template.`)),
 
-			P(Class("lead"), g.Raw(`Hi! 🤓 This is a service template in Go.`)),
+		P(Class("mt-6 text-lg text-gray-600"), g.Raw(`It's made in Go, and it's really nice.`)),
 
-			P(g.Raw(`<a href="https://github.com/maragudk/service">Check out the source code on Github</a>. It’s nice.`)),
-		),
+		P(Class("mt-6 text-lg text-emerald-600 hover:text-emerald-500"), g.Raw(`<a href="https://github.com/maragudk/service">Check out the source code on Github</a>.`)),
 	)
 }
