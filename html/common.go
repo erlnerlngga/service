@@ -18,10 +18,25 @@ type PageProps struct {
 	Description string
 }
 
+func ErrorPage() g.Node {
+	return page(PageProps{Title: "Something went wrong", Description: "Oh no! 😵"},
+		H1(g.Text("Something went wrong")),
+		P(g.Text("Oh no! 😵")),
+		P(A(Href("/"), g.Text("Back to front."))),
+	)
+}
+
+func NotFoundPage() g.Node {
+	return page(PageProps{Title: "There's nothing here!", Description: "Just the void."},
+		H1(g.Text("There's nothing here!")),
+		P(A(Href("/"), g.Text("Back to front."))),
+	)
+}
+
 var hashOnce sync.Once
 var appCSSPath string
 
-func Page(p PageProps, body ...g.Node) g.Node {
+func page(p PageProps, body ...g.Node) g.Node {
 	hashOnce.Do(func() {
 		appCSSPath = getHashedPath("public/styles/app.css")
 	})
@@ -34,8 +49,8 @@ func Page(p PageProps, body ...g.Node) g.Node {
 			Link(Rel("stylesheet"), Href(appCSSPath)),
 		},
 		Body: []g.Node{Class("dark:bg-gray-900"),
-			Container(true,
-				Prose(
+			container(true,
+				prose(
 					g.Group(body),
 				),
 			),
@@ -43,7 +58,7 @@ func Page(p PageProps, body ...g.Node) g.Node {
 	})
 }
 
-func Container(padY bool, children ...g.Node) g.Node {
+func container(padY bool, children ...g.Node) g.Node {
 	return Div(
 		c.Classes{
 			"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8": true,
@@ -53,23 +68,8 @@ func Container(padY bool, children ...g.Node) g.Node {
 	)
 }
 
-func Prose(children ...g.Node) g.Node {
+func prose(children ...g.Node) g.Node {
 	return Div(Class("prose prose-lg lg:prose-xl xl:prose-2xl dark:prose-invert"), g.Group(children))
-}
-
-func ErrorPage() g.Node {
-	return Page(PageProps{Title: "Something went wrong", Description: "Oh no! 😵"},
-		H1(g.Text("Something went wrong")),
-		P(g.Text("Oh no! 😵")),
-		P(A(Href("/"), g.Text("Back to front."))),
-	)
-}
-
-func NotFoundPage() g.Node {
-	return Page(PageProps{Title: "There's nothing here! 💨", Description: "Just the void."},
-		H1(g.Text("There's nothing here! 💨")),
-		P(A(Href("/"), g.Text("Back to front."))),
-	)
 }
 
 func getHashedPath(path string) string {

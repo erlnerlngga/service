@@ -25,6 +25,7 @@ func (s *Server) setupRoutes() {
 		r.Use(middleware.SetHeader("Content-Type", "text/html; charset=utf-8"))
 
 		Home(r)
+		NotFound(r)
 	})
 
 	Migrate(s.mux, s.database)
