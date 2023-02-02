@@ -64,7 +64,7 @@ func start() int {
 	db := sql.NewDatabase(sql.NewDatabaseOptions{
 		Log:                   log,
 		Metrics:               registry,
-		URL:                   env.GetStringOrDefault("DATABASE_URL", "file:app.db"),
+		URL:                   env.GetStringOrDefault("DATABASE_URL", "app.db"),
 		MaxOpenConnections:    env.GetIntOrDefault("DATABASE_MAX_OPEN_CONNS", 5),
 		MaxIdleConnections:    env.GetIntOrDefault("DATABASE_MAX_IDLE_CONNS", 5),
 		ConnectionMaxLifetime: env.GetDurationOrDefault("DATABASE_CONN_MAX_LIFETIME", time.Hour),
