@@ -77,3 +77,29 @@ func (m *Map) Scan(src any) error {
 
 	return json.Unmarshal([]byte(s), m)
 }
+
+type ID string
+
+type Account struct {
+	ID      ID
+	Created Time
+	Updated Time
+	Name    string
+}
+
+type Group struct {
+	ID      ID
+	Created Time
+	Updated Time
+	Name    string
+}
+
+type User struct {
+	ID        ID
+	Created   Time
+	Updated   Time
+	Name      string
+	Email     Email
+	Confirmed bool
+	Active    bool
+}

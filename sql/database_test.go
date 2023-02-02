@@ -4,15 +4,19 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/maragudk/is"
 
 	"github.com/maragudk/service/sqltest"
 )
 
-func TestDatabase_MigrateDown(t *testing.T) {
-	t.Run("can migrate down", func(t *testing.T) {
+func TestDatabase_Migrate(t *testing.T) {
+	t.Run("can migrate down and back up", func(t *testing.T) {
 		db := sqltest.CreateDatabase(t)
+
 		err := db.MigrateDown(context.Background())
-		require.NoError(t, err)
+		is.NotError(t, err)
+
+		err = db.MigrateUp(context.Background())
+		is.NotError(t, err)
 	})
 }
