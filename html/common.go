@@ -34,11 +34,12 @@ func NotFoundPage() g.Node {
 }
 
 var hashOnce sync.Once
-var appCSSPath string
+var appCSSPath, appJSPath string
 
 func page(p PageProps, body ...g.Node) g.Node {
 	hashOnce.Do(func() {
 		appCSSPath = getHashedPath("public/styles/app.css")
+		appJSPath = getHashedPath("public/scripts/app.js")
 	})
 
 	return c.HTML5(c.HTML5Props{
@@ -47,6 +48,9 @@ func page(p PageProps, body ...g.Node) g.Node {
 		Language:    "en",
 		Head: []g.Node{
 			Link(Rel("stylesheet"), Href(appCSSPath)),
+			Script(Src(appJSPath), Defer()),
+			favIcons(),
+			openGraph(p.Title, p.Description, "/images/logo.png", ""),
 		},
 		Body: []g.Node{Class("dark:bg-gray-900"),
 			container(true,
@@ -70,6 +74,30 @@ func container(padY bool, children ...g.Node) g.Node {
 
 func prose(children ...g.Node) g.Node {
 	return Div(Class("prose prose-lg lg:prose-xl xl:prose-2xl dark:prose-invert"), g.Group(children))
+}
+
+const themeColor = "#ffffff"
+
+func favIcons() g.Node {
+	return g.Group([]g.Node{
+		Link(Rel("apple-touch-icon"), g.Attr("sizes", "180x180"), Href("/apple-touch-icon.png")),
+		Link(Rel("icon"), Type("image/png"), g.Attr("sizes", "32x32"), Href("/favicon-32x32.png")),
+		Link(Rel("icon"), Type("image/png"), g.Attr("sizes", "16x16"), Href("/favicon-16x16.png")),
+		Link(Rel("manifest"), Href("/manifest.json")),
+		Link(Rel("mask-icon"), Href("/safari-pinned-tab.svg"), g.Attr("color", themeColor)),
+		Meta(Name("msapplication-TileColor"), Content(themeColor)),
+		Meta(Name("theme-color"), Content(themeColor)),
+	})
+}
+
+func openGraph(title, description, image, url string) g.Node {
+	return g.Group([]g.Node{
+		Meta(g.Attr("property", "og:type"), Content("website")),
+		Meta(g.Attr("property", "og:title"), Content(title)),
+		g.If(description != "", Meta(g.Attr("property", "og:description"), Content(description))),
+		g.If(image != "", Meta(g.Attr("property", "og:image"), Content(image))),
+		g.If(url != "", Meta(g.Attr("property", "og:url"), Content(url))),
+	})
 }
 
 func getHashedPath(path string) string {
