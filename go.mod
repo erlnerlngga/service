@@ -16,6 +16,7 @@ require (
 	github.com/maragudk/errors v0.1.1
 	github.com/maragudk/gomponents v0.20.0
 	github.com/maragudk/gomponents-heroicons/v2 v2.0.0-beta1
+	github.com/maragudk/httph v0.1.0
 	github.com/maragudk/is v0.1.0
 	github.com/maragudk/migrate v0.4.3
 	github.com/mattn/go-sqlite3 v1.14.16
@@ -46,6 +47,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pborman/uuid v1.2.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect

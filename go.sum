@@ -356,6 +356,8 @@ github.com/maragudk/gomponents v0.20.0 h1:lJn5PMYHAKm8jywfk3UiL9tm54ZBkv5R5WktY4
 github.com/maragudk/gomponents v0.20.0/go.mod h1:nHkNnZL6ODgMBeJhrZjkMHVvNdoYsfmpKB2/hjdQ0Hg=
 github.com/maragudk/gomponents-heroicons/v2 v2.0.0-beta1 h1:U8RQwRpLOrabuCcNbIMQzzxF0MnAiwj/+f1rHPwxzbs=
 github.com/maragudk/gomponents-heroicons/v2 v2.0.0-beta1/go.mod h1:VpIu9qDA7B4xB/ghId8DMFQXeAOVISZ5GMOZY8Aq/YY=
+github.com/maragudk/httph v0.1.0 h1:NvthQ7QQdaYdzNT1QB+zZ9sIoYHVRO1yiQ8kXa8reDc=
+github.com/maragudk/httph v0.1.0/go.mod h1:6ziUCAYyAph3FFgtg0B7Uo3ySs/8qSt2WWkYYjmYZCQ=
 github.com/maragudk/is v0.1.0 h1:obq9anZNmOYcaNbeT0LMyjIexdNeYTw/TLAPD/BnZHA=
 github.com/maragudk/is v0.1.0/go.mod h1:W/r6+TpnISu+a88OLXQy5JQGCOhXQXXLD2e5b4xMn5c=
 github.com/maragudk/migrate v0.4.3 h1:3NrpSzNdCSSPgN/xwkEduEwqrBIRewSEvtN+mhMS6zc=
@@ -388,6 +390,8 @@ github.com/mitchellh/gox v0.4.0/go.mod h1:Sd9lOJ0+aimLBi73mGofS1ycjY8lL3uZM3JPS4
 github.com/mitchellh/iochan v1.0.0/go.mod h1:JwYml1nuB7xOzsp52dPpHFffvOCDupsG0QubkSMEySY=
 github.com/mitchellh/mapstructure v0.0.0-20160808181253-ca63d7c062ee/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
+github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyuac5Z2hdY=
+github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=

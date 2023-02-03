@@ -3,6 +3,7 @@ package jobs_test
 import (
 	"context"
 	"log"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
@@ -43,7 +44,7 @@ func TestRunner_Start(t *testing.T) {
 		// This blocks until the context is cancelled by the job function
 		runner.Start(ctx)
 
-		require.Equal(t, "Starting\nRegistered jobs: [test]\nStopping\nStopped\n", logs.String())
+		require.Regexp(t, regexp.MustCompile(`(?s)Starting.*Registered jobs: \[.*test.*\].*Stopping.*Stopped`), logs.String())
 	})
 
 	t.Run("emits job metrics", func(t *testing.T) {

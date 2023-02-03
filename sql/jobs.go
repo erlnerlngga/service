@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/maragudk/errors"
 
 	"github.com/maragudk/service/model"
@@ -12,15 +13,27 @@ import (
 
 // CreateJob to run immediately.
 func (d *Database) CreateJob(ctx context.Context, name string, payload model.Map, timeout time.Duration) error {
-	return d.CreateJobForLater(ctx, name, payload, timeout, 0)
+	return d.inTransaction(ctx, func(tx *sqlx.Tx) error {
+		return d.createJobInTx(ctx, tx, name, payload, timeout)
+	})
 }
 
 func (d *Database) CreateJobForLater(ctx context.Context, name string, payload model.Map, timeout, after time.Duration) error {
+	return d.inTransaction(ctx, func(tx *sqlx.Tx) error {
+		return d.createJobForLaterInTx(ctx, tx, name, payload, timeout, after)
+	})
+}
+
+func (d *Database) createJobInTx(ctx context.Context, tx *sqlx.Tx, name string, payload model.Map, timeout time.Duration) error {
+	return d.createJobForLaterInTx(ctx, tx, name, payload, timeout, 0)
+}
+
+func (d *Database) createJobForLaterInTx(ctx context.Context, tx *sqlx.Tx, name string, payload model.Map, timeout, after time.Duration) error {
 	if name == "" {
 		panic("job name cannot be empty")
 	}
 	query := `insert into jobs (name, payload, timeout, run) values (?, ?, ?, ?)`
-	_, err := d.DB.ExecContext(ctx, query, name, payload, timeout, model.Time{T: time.Now().Add(after)})
+	_, err := tx.ExecContext(ctx, query, name, payload, timeout, model.Time{T: time.Now().Add(after)})
 	return err
 }
 

@@ -13,17 +13,15 @@ import (
 )
 
 func TestDatabase_Signup(t *testing.T) {
-	t.Run("signs up an account, group, and user, and returns a token", func(t *testing.T) {
+	t.Run("signs up an account, group, and user, and creates a token and a job", func(t *testing.T) {
 		db := sqltest.CreateDatabase(t)
 
 		u := model.User{
 			Name:  "Me",
 			Email: "Me@example.com",
 		}
-		token, err := db.Signup(context.Background(), &u)
+		err := db.Signup(context.Background(), &u)
 		is.NotError(t, err)
-		is.Equal(t, 34, len(token))
-		is.True(t, strings.HasPrefix(token, "t_"))
 
 		is.Equal(t, 34, len(u.ID))
 		is.True(t, strings.HasPrefix(u.ID.String(), "u_"))
@@ -57,6 +55,19 @@ func TestDatabase_Signup(t *testing.T) {
 			u.ID, g.ID)
 		is.NotError(t, err)
 		is.True(t, exists)
+
+		var token string
+		err = db.DB.Get(&token, `select value from tokens where userID = ?`, u.ID)
+		is.NotError(t, err)
+		is.Equal(t, 34, len(token))
+		is.True(t, strings.HasPrefix(token, "t_"))
+
+		job, err := db.GetJob(context.Background())
+		is.NotError(t, err)
+		is.NotNil(t, job)
+		is.Equal(t, "send-email", job.Name)
+		is.Equal(t, "signup", job.Payload["type"])
+		is.Equal(t, token, job.Payload["token"])
 	})
 
 	t.Run("errors on duplicate email", func(t *testing.T) {
@@ -66,10 +77,10 @@ func TestDatabase_Signup(t *testing.T) {
 			Name:  "Me",
 			Email: "Me@example.com",
 		}
-		_, err := db.Signup(context.Background(), &u)
+		err := db.Signup(context.Background(), &u)
 		is.NotError(t, err)
 
-		_, err = db.Signup(context.Background(), &u)
+		err = db.Signup(context.Background(), &u)
 		is.Error(t, model.ErrorEmailConflict, err)
 	})
 }

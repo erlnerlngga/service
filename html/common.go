@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	g "github.com/maragudk/gomponents"
+	"github.com/maragudk/gomponents-heroicons/v2/mini"
 	c "github.com/maragudk/gomponents/components"
 	. "github.com/maragudk/gomponents/html"
 
@@ -102,6 +103,19 @@ func input(children ...g.Node) g.Node {
 
 func button(children ...g.Node) g.Node {
 	return Button(Class("block w-full rounded-md bg-cyan-600 hover:bg-cyan-700 px-4 py-2 font-medium text-white focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"), g.Group(children))
+}
+
+func alertBox(children ...g.Node) g.Node {
+	return Div(Class("rounded-lg bg-yellow-50 p-4"),
+		Div(Class("flex items-center space-x-2"),
+			Div(Class("flex-shrink-0"),
+				mini.ExclamationTriangle(Class("h-5 w-5 text-yellow-400")),
+			),
+			Div(Class("text-yellow-700"),
+				g.Group(children),
+			),
+		),
+	)
 }
 
 const themeColor = "#ffffff"

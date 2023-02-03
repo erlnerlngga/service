@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/maragudk/errors"
@@ -12,13 +13,14 @@ import (
 )
 
 // Signup creates an account, a personal group, an unconfirmed user, and a token.
-func (d *Database) Signup(ctx context.Context, u *model.User) (string, error) {
-	token, err := createToken()
-	if err != nil {
-		return "", err
-	}
+// Also creates a job to send an email with a token.
+func (d *Database) Signup(ctx context.Context, u *model.User) error {
+	return d.inTransaction(ctx, func(tx *sqlx.Tx) error {
+		token, err := createToken()
+		if err != nil {
+			return err
+		}
 
-	return token, d.inTransaction(ctx, func(tx *sqlx.Tx) error {
 		var a model.Account
 		if err := tx.GetContext(ctx, &a, `insert into accounts (name) values (?) returning *`, u.Name); err != nil {
 			return errors.Wrap(err, "error creating account")
@@ -52,6 +54,14 @@ func (d *Database) Signup(ctx context.Context, u *model.User) (string, error) {
 		query = `insert into tokens (value, userID) values (?, ?)`
 		if _, err := tx.ExecContext(ctx, query, token, u.ID); err != nil {
 			return errors.Wrap(err, "error creating token")
+		}
+
+		m := model.Map{
+			"type":  "signup",
+			"token": token,
+		}
+		if err := d.createJobInTx(ctx, tx, "send-email", m, 10*time.Second); err != nil {
+			return err
 		}
 
 		return nil

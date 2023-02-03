@@ -27,7 +27,7 @@ func (s *Server) setupRoutes() {
 			r.Use(middleware.SetHeader("Content-Type", "text/html; charset=utf-8"))
 			r.Use(s.sm.LoadAndSave)
 
-			Signup(r)
+			Signup(r, s.log, s.database)
 			Login(r)
 			Logout(r, s.sm, s.log)
 
