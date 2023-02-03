@@ -13,7 +13,7 @@ create table groups (
   id text primary key default ('g_' || lower(hex(randomblob(16)))),
   created text not null default (strftime('%Y-%m-%dT%H:%M:%fZ')),
   updated text not null default (strftime('%Y-%m-%dT%H:%M:%fZ')),
-  accountID int not null references accounts (id) on delete cascade,
+  accountID text not null references accounts (id) on delete cascade,
   name text not null
 ) strict;
 
@@ -25,7 +25,7 @@ create table users (
   id text primary key default ('u_' || lower(hex(randomblob(16)))),
   created text not null default (strftime('%Y-%m-%dT%H:%M:%fZ')),
   updated text not null default (strftime('%Y-%m-%dT%H:%M:%fZ')),
-  accountID int not null references accounts (id) on delete cascade,
+  accountID text not null references accounts (id) on delete cascade,
   name text not null,
   email text unique not null,
   confirmed int not null default 0,
@@ -37,16 +37,16 @@ create trigger users_updated_timestamp after update on users begin
 end;
 
 create table group_membership (
-  group_id text not null references groups (id) on delete cascade,
-  user_id text not null references users (id) on delete cascade,
-  primary key (group_id, user_id)
+  groupID text not null references groups (id) on delete cascade,
+  userID text not null references users (id) on delete cascade,
+  primary key (groupID, userID)
 ) strict;
 
 create table tokens (
   value text primary key,
   created text not null default (strftime('%Y-%m-%dT%H:%M:%fZ')),
   updated text not null default (strftime('%Y-%m-%dT%H:%M:%fZ')),
-  userID int not null references users (id) on delete cascade,
+  userID text not null references users (id) on delete cascade,
   used int not null default 0,
   expires text not null default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '7 days'))
 ) strict;

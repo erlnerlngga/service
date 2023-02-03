@@ -2,6 +2,7 @@ package model
 
 import (
 	"regexp"
+	"strings"
 )
 
 // emailAddressMatcher for valid email addresses.
@@ -27,4 +28,8 @@ func (e Email) IsValid() bool {
 
 func (e Email) String() string {
 	return string(e)
+}
+
+func (e Email) ToLower() Email {
+	return Email(strings.ToLower(string(e)))
 }
