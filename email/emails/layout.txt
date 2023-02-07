@@ -1,5 +1,0 @@
-{{preheader}}
-
-{{body}}
-
-{{unsubscribe}}

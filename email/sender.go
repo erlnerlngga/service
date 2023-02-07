@@ -93,10 +93,17 @@ func NewSender(opts NewSenderOptions) *Sender {
 
 func (s *Sender) SendGenericEmail(ctx context.Context, name string, email model.Email, subject, preheader, content string) error {
 	return s.send(ctx, transactional, createNameAndEmail(name, email.String()), subject, preheader, "generic", keywords{
-		"baseURL": s.baseURL,
 		"title":   subject,
 		"content": content,
 	})
+}
+
+func (s *Sender) SendSignupEmail(ctx context.Context, name string, email model.Email, token string) error {
+	return s.send(ctx, transactional, createNameAndEmail(name, email.String()),
+		fmt.Sprintf("Welcome, %v!", name), "Click the link to log in.", "signup", keywords{
+			"name":  name,
+			"token": token,
+		})
 }
 
 // requestBody used in Sender.send.

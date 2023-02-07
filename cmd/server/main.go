@@ -91,8 +91,7 @@ func start() int {
 	})
 
 	emailSender := email.NewSender(email.NewSenderOptions{
-		BaseURL:                   env.GetStringOrDefault("BASE_URL", "http://localhost"),
-		EndpointURL:               env.GetStringOrDefault("POSTMARK_ENDPOINT_URL", ""),
+		BaseURL:                   env.GetStringOrDefault("BASE_URL", "http://localhost:8080"),
 		Log:                       log,
 		MarketingEmailAddress:     env.GetStringOrDefault("MARKETING_EMAIL_ADDRESS", "marketing@example.com"),
 		MarketingEmailName:        env.GetStringOrDefault("MARKETING_EMAIL_NAME", "Marketing"),

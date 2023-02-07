@@ -3,6 +3,7 @@ package sql
 import (
 	"context"
 	"crypto/rand"
+	"database/sql"
 	"fmt"
 	"time"
 
@@ -66,6 +67,18 @@ func (d *Database) Signup(ctx context.Context, u *model.User) error {
 
 		return nil
 	})
+}
+
+func (d *Database) GetUserFromToken(ctx context.Context, token string) (*model.User, error) {
+	var u model.User
+	query := `select users.* from users join tokens on tokens.userID = users.id where tokens.value = ?`
+	if err := d.DB.GetContext(ctx, &u, query, token); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &u, nil
 }
 
 func createToken() (string, error) {
