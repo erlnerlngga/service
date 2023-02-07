@@ -9,7 +9,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -131,7 +130,6 @@ func (s *Sender) send(ctx context.Context, typ emailType, to nameAndEmail, subje
 		From:          from,
 		To:            to,
 		Subject:       subject,
-		TextBody:      getEmail(template+".txt", preheader, keywords),
 		HtmlBody:      getEmail(template+".html", preheader, keywords),
 	})
 
@@ -216,7 +214,7 @@ func getEmail(path, preheader string, keywords keywords) string {
 		panic(err)
 	}
 
-	layout, err := emails.ReadFile("emails/layout" + filepath.Ext(path))
+	layout, err := emails.ReadFile("emails/layout.html")
 	if err != nil {
 		panic(err)
 	}
