@@ -9,7 +9,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . ./
-RUN GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o /bin/server ./cmd/server
+RUN GOOS=linux GOARCH=amd64 go build -buildvcs=false -ldflags="-s -w" -o /bin/server ./cmd/server
 RUN ./tailwindcss -i tailwind.css -o app.css --minify
 
 FROM debian:bullseye-slim AS runner
