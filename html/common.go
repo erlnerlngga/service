@@ -38,6 +38,7 @@ func page(p PageProps, body ...g.Node) g.Node {
 		Head: []g.Node{
 			Link(Rel("stylesheet"), Href(appCSSPath)),
 			Script(Src(appJSPath), Defer()),
+			Script(Src("https://cdn.usefathom.com/script.js"), DataAttr("site", "HORSE"), Defer()),
 			favIcons(),
 			openGraph(p.Title, p.Description, "/images/logo.png", ""),
 		},
