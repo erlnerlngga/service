@@ -34,7 +34,7 @@ func (s *Server) setupRoutes() {
 			r.Use(s.sm.LoadAndSave)
 
 			Signup(r, s.log, s.database)
-			Login(r)
+			Login(r, s.log, s.database, s.sm)
 			Logout(r, s.sm, s.log)
 
 			Home(r)

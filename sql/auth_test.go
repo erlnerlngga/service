@@ -84,3 +84,35 @@ func TestDatabase_Signup(t *testing.T) {
 		is.Error(t, model.ErrorEmailConflict, err)
 	})
 }
+
+func TestDatabase_Login(t *testing.T) {
+	t.Run("marks token used and user confirmed and returns user id", func(t *testing.T) {
+		db := sqltest.CreateDatabase(t)
+
+		u := model.User{
+			Name:  "Me",
+			Email: "Me@example.com",
+		}
+		err := db.Signup(context.Background(), &u)
+		is.NotError(t, err)
+
+		var token string
+		err = db.DB.Get(&token, `select value from tokens where userID = ?`, u.ID)
+		is.NotError(t, err)
+
+		userID, err := db.Login(context.Background(), token)
+		is.NotError(t, err)
+		is.NotNil(t, userID)
+		is.Equal(t, u.ID, *userID)
+
+		var used bool
+		err = db.DB.Get(&used, `select used from tokens where value = ?`, token)
+		is.NotError(t, err)
+		is.True(t, used)
+
+		var confirmed bool
+		err = db.DB.Get(&confirmed, `select confirmed from users where id = ?`, userID)
+		is.NotError(t, err)
+		is.True(t, confirmed)
+	})
+}

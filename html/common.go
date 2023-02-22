@@ -90,6 +90,10 @@ func h1(children ...g.Node) g.Node {
 	return H1(Class("font-medium text-gray-900 text-xl"), g.Group(children))
 }
 
+func p(class string, children ...g.Node) g.Node {
+	return P(Class("text-gray-900 "+class), g.Group(children))
+}
+
 func a(children ...g.Node) g.Node {
 	return A(Class("font-medium text-cyan-600 hover:text-cyan-500"), g.Group(children))
 }
