@@ -16,7 +16,7 @@ require (
 	github.com/maragudk/errors v0.1.1
 	github.com/maragudk/gomponents v0.20.0
 	github.com/maragudk/gomponents-heroicons/v2 v2.0.0-beta1
-	github.com/maragudk/httph v0.1.0
+	github.com/maragudk/httph v0.2.1
 	github.com/maragudk/is v0.1.0
 	github.com/maragudk/migrate v0.4.3
 	github.com/mattn/go-sqlite3 v1.14.16
