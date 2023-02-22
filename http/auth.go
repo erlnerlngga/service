@@ -18,6 +18,7 @@ import (
 type contextKey string
 
 const contextUserKey = contextKey("user")
+const sessionUserIDKey = "userID"
 
 // getUserFromContext, which may be nil if the user is not authenticated.
 func getUserFromContext(ctx context.Context) *model.User {
@@ -84,13 +85,48 @@ func Signup(mux chi.Router, log *log.Logger, db signupper) {
 				return html.ErrorPage(), err
 			}
 
-			http.Redirect(w, r, "/", http.StatusFound)
+			http.Redirect(w, r, "/signup/thanks", http.StatusFound)
 			return nil, nil
 		})(w, r)
 	}))
+
+	mux.Get("/signup/thanks", ghttp.Adapt(func(w http.ResponseWriter, r *http.Request) (g.Node, error) {
+		return html.SignupThanksPage(html.PageProps{}), nil
+	}))
 }
 
-func Login(mux chi.Router) {
+type loginner interface {
+	Login(ctx context.Context, token string) (*model.ID, error)
+}
+
+type sessionPutter interface {
+	RenewToken(ctx context.Context) error
+	Put(ctx context.Context, key string, value interface{})
+}
+
+type loginEmailRequest struct {
+	Email model.Email
+}
+
+func (l loginEmailRequest) Validate() error {
+	if !l.Email.IsValid() {
+		return errors.New("email is invalid")
+	}
+	return nil
+}
+
+type loginTokenRequest struct {
+	Token string
+}
+
+func (l loginTokenRequest) Validate() error {
+	if l.Token == "" {
+		return errors.New("token is invalid")
+	}
+	return nil
+}
+
+func Login(mux chi.Router, log *log.Logger, db loginner, sp sessionPutter) {
 	mux.Get("/login", ghttp.Adapt(func(w http.ResponseWriter, r *http.Request) (g.Node, error) {
 		user := getUserFromContext(r.Context())
 		if user != nil {
@@ -98,7 +134,47 @@ func Login(mux chi.Router) {
 			return nil, nil
 		}
 
+		token := r.URL.Query().Get("token")
+		if token != "" {
+			return html.LoginTokenPage(html.PageProps{}, token), nil
+		}
 		return html.LoginPage(html.PageProps{}), nil
+	}))
+
+	mux.Post("/login/email", httph.FormHandler(func(w http.ResponseWriter, r *http.Request, req loginEmailRequest) {
+		// TODO
+		http.Redirect(w, r, "/login/email", http.StatusFound)
+	}))
+
+	mux.Get("/login/email", ghttp.Adapt(func(w http.ResponseWriter, r *http.Request) (g.Node, error) {
+		user := getUserFromContext(r.Context())
+		if user != nil {
+			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+			return nil, nil
+		}
+
+		return html.LoginCheckPage(html.PageProps{}), nil
+	}))
+
+	mux.Post("/login/token", httph.FormHandler(func(w http.ResponseWriter, r *http.Request, req loginTokenRequest) {
+		ghttp.Adapt(func(w http.ResponseWriter, r *http.Request) (g.Node, error) {
+			userID, err := db.Login(r.Context(), req.Token)
+			if err != nil {
+				// TODO need to differentiate between different kinds of errors?
+				return html.ErrorPage(), nil
+			}
+
+			// Renew the session token to avoid session fixation attacks
+			if err := sp.RenewToken(r.Context()); err != nil {
+				log.Println("Error renewing session token during token confirm:", err)
+				return html.ErrorPage(), err
+			}
+
+			sp.Put(r.Context(), sessionUserIDKey, string(*userID))
+
+			http.Redirect(w, r, "/", http.StatusFound)
+			return nil, nil
+		})(w, r)
 	}))
 }
 

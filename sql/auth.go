@@ -69,6 +69,36 @@ func (d *Database) Signup(ctx context.Context, u *model.User) error {
 	})
 }
 
+// Login with the given token. It marks the token as used (but this isn't currently checked anywhere)
+// if it's not expired and if the user is marked active.
+// It also sets the user confirmed.
+func (d *Database) Login(ctx context.Context, token string) (*model.ID, error) {
+	var userID model.ID
+	err := d.inTransaction(ctx, func(tx *sqlx.Tx) error {
+		query := `
+			update tokens
+			set used = 1
+			where value = ? and expires > strftime('%Y-%m-%dT%H:%M:%fZ') and
+				exists (select 1 from users where id = userID and active)
+			returning userID`
+		if err := tx.GetContext(ctx, &userID, query, token); err != nil {
+			return err
+		}
+
+		query = `update users set confirmed = 1 where id = ? and not confirmed`
+		if _, err := tx.ExecContext(ctx, query, userID); err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &userID, nil
+}
+
 func (d *Database) GetUserFromToken(ctx context.Context, token string) (*model.User, error) {
 	var u model.User
 	query := `select users.* from users join tokens on tokens.userID = users.id where tokens.value = ?`

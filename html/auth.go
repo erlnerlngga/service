@@ -54,13 +54,30 @@ func SignupPage(p PageProps, newUser model.User) g.Node {
 	)
 }
 
+func SignupThanksPage(props PageProps) g.Node {
+	props.Title = "Thank you for signing up"
+
+	return page(props,
+		Div(Class("sm:mx-auto sm:w-full sm:max-w-md"),
+			card(
+				Div(Class("text-center"),
+					h1(g.Text(`Check your email`)),
+				),
+
+				p("mt-8", g.Raw(`Thank you for signing up! 😊`)),
+				p("mt-4", g.Raw(`Now check your email and click the link in it.`)),
+			),
+		),
+	)
+}
+
 func LoginPage(p PageProps) g.Node {
 	p.Title = "Log in"
 
 	return page(p,
 		Div(Class("sm:mx-auto sm:w-full sm:max-w-md"),
 			card(
-				FormEl(Action("/login"), Method("post"), Class("space-y-6"),
+				FormEl(Action("/login/email"), Method("post"), Class("space-y-6"),
 					Div(Class("text-center"),
 						h1(g.Text(`Log in`)),
 						a(Href("/signup"), g.Text("or sign up instead")),
@@ -73,6 +90,38 @@ func LoginPage(p PageProps) g.Node {
 
 					button(Type("submit"), g.Text(`Log in`)),
 				),
+			),
+		),
+	)
+}
+
+func LoginTokenPage(p PageProps, token string) g.Node {
+	p.Title = "Log in"
+
+	return page(p,
+		Div(Class("sm:mx-auto sm:w-full sm:max-w-md"),
+			card(
+				FormEl(Action("/login/token"), Method("post"),
+					Input(Type("hidden"), Name("token"), Value(token)),
+
+					button(Type("submit"), g.Text(`Log in`)),
+				),
+			),
+		),
+	)
+}
+
+func LoginCheckPage(props PageProps) g.Node {
+	props.Title = "Check your email"
+
+	return page(props,
+		Div(Class("sm:mx-auto sm:w-full sm:max-w-md"),
+			card(
+				Div(Class("text-center"),
+					h1(g.Text(`Check your email`)),
+				),
+
+				p("mt-8", g.Raw(`Now check your email and click the link in it.`)),
 			),
 		),
 	)
