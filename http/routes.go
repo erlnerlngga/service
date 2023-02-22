@@ -4,6 +4,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/honeybadger-io/honeybadger-go"
+	"github.com/maragudk/httph"
 )
 
 func (s *Server) setupRoutes() {
@@ -23,7 +24,12 @@ func (s *Server) setupRoutes() {
 		})
 
 		r.Group(func(r chi.Router) {
-			r.Use(NoClickjacking, StrictContentSecurityPolicy)
+			r.Use(httph.NoClickjacking, httph.ContentSecurityPolicy(func(opts *httph.ContentSecurityPolicyOptions) {
+				opts.ConnectSrc = "'self' https://cdn.usefathom.com"
+				opts.ImgSrc = "'self' https://cdn.usefathom.com"
+				opts.ManifestSrc = "'self'"
+				opts.ScriptSrc = "'self' https://cdn.usefathom.com"
+			}))
 			r.Use(middleware.SetHeader("Content-Type", "text/html; charset=utf-8"))
 			r.Use(s.sm.LoadAndSave)
 

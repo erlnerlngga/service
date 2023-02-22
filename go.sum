@@ -356,8 +356,8 @@ github.com/maragudk/gomponents v0.20.0 h1:lJn5PMYHAKm8jywfk3UiL9tm54ZBkv5R5WktY4
 github.com/maragudk/gomponents v0.20.0/go.mod h1:nHkNnZL6ODgMBeJhrZjkMHVvNdoYsfmpKB2/hjdQ0Hg=
 github.com/maragudk/gomponents-heroicons/v2 v2.0.0-beta1 h1:U8RQwRpLOrabuCcNbIMQzzxF0MnAiwj/+f1rHPwxzbs=
 github.com/maragudk/gomponents-heroicons/v2 v2.0.0-beta1/go.mod h1:VpIu9qDA7B4xB/ghId8DMFQXeAOVISZ5GMOZY8Aq/YY=
-github.com/maragudk/httph v0.1.0 h1:NvthQ7QQdaYdzNT1QB+zZ9sIoYHVRO1yiQ8kXa8reDc=
-github.com/maragudk/httph v0.1.0/go.mod h1:6ziUCAYyAph3FFgtg0B7Uo3ySs/8qSt2WWkYYjmYZCQ=
+github.com/maragudk/httph v0.2.1 h1:R8gRRwp6qZZBETdi+KyZ4EG3lFNpQWEYY4uVKaWd47o=
+github.com/maragudk/httph v0.2.1/go.mod h1:6ziUCAYyAph3FFgtg0B7Uo3ySs/8qSt2WWkYYjmYZCQ=
 github.com/maragudk/is v0.1.0 h1:obq9anZNmOYcaNbeT0LMyjIexdNeYTw/TLAPD/BnZHA=
 github.com/maragudk/is v0.1.0/go.mod h1:W/r6+TpnISu+a88OLXQy5JQGCOhXQXXLD2e5b4xMn5c=
 github.com/maragudk/migrate v0.4.3 h1:3NrpSzNdCSSPgN/xwkEduEwqrBIRewSEvtN+mhMS6zc=
