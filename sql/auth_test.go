@@ -159,4 +159,12 @@ func TestDatabase_Login(t *testing.T) {
 		is.Error(t, model.ErrorUserInactive, err)
 		is.Nil(t, userID)
 	})
+
+	t.Run("returns error if no such token", func(t *testing.T) {
+		db := sqltest.CreateDatabase(t)
+
+		userID, err := db.Login(context.Background(), "t_018743ccfbed090e8f5eebc810ff797d")
+		is.Error(t, model.ErrorTokenNotFound, err)
+		is.Nil(t, userID)
+	})
 }

@@ -95,6 +95,9 @@ func (d *Database) Login(ctx context.Context, token string) (*model.ID, error) {
 
 		query = `update tokens set used = 1 where value = ? returning userID`
 		if err := tx.GetContext(ctx, &userID, query, token); err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				return model.ErrorTokenNotFound
+			}
 			return err
 		}
 

@@ -165,6 +165,8 @@ func Login(mux chi.Router, log *log.Logger, db loginner, sp sessionPutter) {
 					return html.UserInactivePage(html.PageProps{}), nil
 				case errors.Is(err, model.ErrorTokenExpired):
 					return html.TokenExpiredPage(html.PageProps{}), nil
+				case errors.Is(err, model.ErrorTokenNotFound):
+					return html.TokenExpiredPage(html.PageProps{}), nil
 				default:
 					return html.ErrorPage(), err
 				}
