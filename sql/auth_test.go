@@ -115,4 +115,56 @@ func TestDatabase_Login(t *testing.T) {
 		is.NotError(t, err)
 		is.True(t, confirmed)
 	})
+
+	t.Run("returns token expired error when token is expired", func(t *testing.T) {
+		db := sqltest.CreateDatabase(t)
+
+		u := model.User{
+			Name:  "Me",
+			Email: "Me@example.com",
+		}
+		err := db.Signup(context.Background(), &u)
+		is.NotError(t, err)
+
+		var token string
+		err = db.DB.Get(&token, `select value from tokens where userID = ?`, u.ID)
+		is.NotError(t, err)
+
+		_, err = db.DB.Exec(`update tokens set expires = '2001-01-01T00:00:00.000Z' where value = ?`, token)
+		is.NotError(t, err)
+
+		userID, err := db.Login(context.Background(), token)
+		is.Error(t, model.ErrorTokenExpired, err)
+		is.Nil(t, userID)
+	})
+
+	t.Run("returns user inactive error when user not active", func(t *testing.T) {
+		db := sqltest.CreateDatabase(t)
+
+		u := model.User{
+			Name:  "Me",
+			Email: "Me@example.com",
+		}
+		err := db.Signup(context.Background(), &u)
+		is.NotError(t, err)
+
+		var token string
+		err = db.DB.Get(&token, `select value from tokens where userID = ?`, u.ID)
+		is.NotError(t, err)
+
+		_, err = db.DB.Exec(`update users set active = false where id = ?`, u.ID)
+		is.NotError(t, err)
+
+		userID, err := db.Login(context.Background(), token)
+		is.Error(t, model.ErrorUserInactive, err)
+		is.Nil(t, userID)
+	})
+
+	t.Run("returns error if no such token", func(t *testing.T) {
+		db := sqltest.CreateDatabase(t)
+
+		userID, err := db.Login(context.Background(), "t_018743ccfbed090e8f5eebc810ff797d")
+		is.Error(t, model.ErrorTokenNotFound, err)
+		is.Nil(t, userID)
+	})
 }

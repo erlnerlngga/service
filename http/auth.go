@@ -160,8 +160,14 @@ func Login(mux chi.Router, log *log.Logger, db loginner, sp sessionPutter) {
 		ghttp.Adapt(func(w http.ResponseWriter, r *http.Request) (g.Node, error) {
 			userID, err := db.Login(r.Context(), req.Token)
 			if err != nil {
-				// TODO need to differentiate between different kinds of errors?
-				return html.ErrorPage(), nil
+				switch {
+				case errors.Is(err, model.ErrorUserInactive):
+					return html.UserInactivePage(html.PageProps{}), nil
+				case errors.Is(err, model.ErrorTokenExpired), errors.Is(err, model.ErrorTokenNotFound):
+					return html.TokenExpiredPage(html.PageProps{}), nil
+				default:
+					return html.ErrorPage(), err
+				}
 			}
 
 			// Renew the session token to avoid session fixation attacks
