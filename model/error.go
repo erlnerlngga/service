@@ -5,6 +5,8 @@ type Error string
 
 const (
 	ErrorEmailConflict = Error("EMAIL_CONFLICT")
+	ErrorTokenExpired  = Error("TOKEN_EXPIRED")
+	ErrorUserInactive  = Error("USER_INACTIVE")
 )
 
 func (e Error) Error() string {

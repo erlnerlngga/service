@@ -75,12 +75,25 @@ func (d *Database) Signup(ctx context.Context, u *model.User) error {
 func (d *Database) Login(ctx context.Context, token string) (*model.ID, error) {
 	var userID model.ID
 	err := d.inTransaction(ctx, func(tx *sqlx.Tx) error {
-		query := `
-			update tokens
-			set used = 1
-			where value = ? and expires > strftime('%Y-%m-%dT%H:%M:%fZ') and
-				exists (select 1 from users where id = userID and active)
-			returning userID`
+		var expired bool
+		query := `select exists (select 1 from tokens where value = ? and expires <= strftime('%Y-%m-%dT%H:%M:%fZ'))`
+		if err := tx.GetContext(ctx, &expired, query, token); err != nil {
+			return err
+		}
+		if expired {
+			return model.ErrorTokenExpired
+		}
+
+		var inactive bool
+		query = `select exists (select 1 from users where id = (select userID from tokens where value = ?) and not active)`
+		if err := tx.GetContext(ctx, &inactive, query, token); err != nil {
+			return err
+		}
+		if inactive {
+			return model.ErrorUserInactive
+		}
+
+		query = `update tokens set used = 1 where value = ? returning userID`
 		if err := tx.GetContext(ctx, &userID, query, token); err != nil {
 			return err
 		}
