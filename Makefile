@@ -17,7 +17,12 @@ tailwindcss:
 
 .PHONY: test
 test:
+	go test -coverprofile=cover.out -shuffle on -short ./...
+
+.PHONY: test-integration
+test-integration:
 	go test -coverprofile=cover.out -shuffle on ./...
+
 
 .PHONY: watch-css
 watch-css: tailwindcss

@@ -12,6 +12,7 @@ import (
 
 func Home(mux chi.Router) {
 	mux.Get("/", ghttp.Adapt(func(w http.ResponseWriter, r *http.Request) (g.Node, error) {
-		return html.HomePage(html.PageProps{User: getUserFromContext(r.Context())}), nil
+		user := getUserFromContext(r.Context())
+		return html.HomePage(html.PageProps{User: user}), nil
 	}))
 }

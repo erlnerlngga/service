@@ -46,6 +46,7 @@ type Sender struct {
 	endpointURL       string
 	log               *log.Logger
 	marketingFrom     nameAndEmail
+	replyTo           nameAndEmail
 	token             string
 	transactionalFrom nameAndEmail
 }
@@ -57,6 +58,8 @@ type NewSenderOptions struct {
 	MarketingEmailAddress     string
 	MarketingEmailName        string
 	Metrics                   *prometheus.Registry
+	ReplyToEmailName          string
+	ReplyToEmailAddress       string
 	Token                     string
 	TransactionalEmailAddress string
 	TransactionalEmailName    string
@@ -86,6 +89,7 @@ func NewSender(opts NewSenderOptions) *Sender {
 		endpointURL:       opts.EndpointURL,
 		log:               opts.Log,
 		marketingFrom:     createNameAndEmail(opts.MarketingEmailName, opts.MarketingEmailAddress),
+		replyTo:           createNameAndEmail(opts.ReplyToEmailName, opts.ReplyToEmailAddress),
 		token:             opts.Token,
 		transactionalFrom: createNameAndEmail(opts.TransactionalEmailName, opts.TransactionalEmailAddress),
 	}
@@ -106,12 +110,21 @@ func (s *Sender) SendSignupEmail(ctx context.Context, name string, email model.E
 		})
 }
 
+func (s *Sender) SendLoginEmail(ctx context.Context, name string, email model.Email, token string) error {
+	return s.send(ctx, transactional, createNameAndEmail(name, email.String()),
+		fmt.Sprintf("Welcome back, %v!", name), "Click the link to log in.", "login", keywords{
+			"name":  name,
+			"token": token,
+		})
+}
+
 // requestBody used in Sender.send.
 // See https://postmarkapp.com/developer/user-guide/send-email-with-api
 type requestBody struct {
 	MessageStream string
 	From          nameAndEmail
 	To            nameAndEmail
+	ReplyTo       nameAndEmail
 	Subject       string
 	TextBody      string
 	HtmlBody      string

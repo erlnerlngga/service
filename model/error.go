@@ -8,6 +8,7 @@ const (
 	ErrorTokenExpired  = Error("TOKEN_EXPIRED")
 	ErrorUserInactive  = Error("USER_INACTIVE")
 	ErrorTokenNotFound = Error("TOKEN_NOT_FOUND")
+	ErrorUserNotFound  = Error("USER_NOT_FOUND")
 )
 
 func (e Error) Error() string {

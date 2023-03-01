@@ -67,7 +67,7 @@ func SignupThanksPage(props PageProps) g.Node {
 	)
 }
 
-func LoginPage(p PageProps) g.Node {
+func LoginPage(p PageProps, email string) g.Node {
 	p.Title = "Log in"
 
 	return page(p,
@@ -76,6 +76,10 @@ func LoginPage(p PageProps) g.Node {
 				Div(Class("text-center"),
 					h1(g.Text(`Log in`)),
 					a(Href("/signup"), g.Text("or sign up instead")),
+				),
+
+				g.If(email != "",
+					alertBox(g.Raw(`It doesn't look like anyone's signed up with that email address. `), a(Href("/signup"), g.Text("Sign up instead?"))),
 				),
 
 				Div(
@@ -89,12 +93,18 @@ func LoginPage(p PageProps) g.Node {
 	)
 }
 
-func LoginTokenPage(p PageProps, token string) g.Node {
-	p.Title = "Log in"
+func LoginTokenPage(props PageProps, token string) g.Node {
+	props.Title = "Log in"
 
-	return page(p,
+	return page(props,
 		authPageCard(
 			FormEl(Action("/login/token"), Method("post"),
+				Div(Class("text-center"),
+					h1(g.Text(`Log in`)),
+				),
+
+				p("mt-8 mb-4", g.Raw(`Click the button to log in. 😊`)),
+
 				Input(Type("hidden"), Name("token"), Value(token)),
 
 				button(Type("submit"), g.Text(`Log in`)),

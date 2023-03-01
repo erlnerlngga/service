@@ -96,6 +96,8 @@ func start() int {
 		MarketingEmailAddress:     env.GetStringOrDefault("MARKETING_EMAIL_ADDRESS", "marketing@example.com"),
 		MarketingEmailName:        env.GetStringOrDefault("MARKETING_EMAIL_NAME", "Marketing"),
 		Metrics:                   registry,
+		ReplyToEmailAddress:       env.GetStringOrDefault("REPLY_TO_EMAIL_ADDRESS", "support@example.com"),
+		ReplyToEmailName:          env.GetStringOrDefault("REPLY_TO_EMAIL_NAME", "Support"),
 		Token:                     env.GetStringOrDefault("POSTMARK_TOKEN", ""),
 		TransactionalEmailAddress: env.GetStringOrDefault("TRANSACTIONAL_EMAIL_ADDRESS", "transactional@example.com"),
 		TransactionalEmailName:    env.GetStringOrDefault("TRANSACTIONAL_EMAIL_NAME", "Transactional"),
@@ -109,6 +111,7 @@ func start() int {
 		Metrics:       registry,
 		ObjectStore:   objectStore,
 		Port:          env.GetIntOrDefault("PORT", 8080),
+		SecureCookie:  env.GetBoolOrDefault("SECURE_COOKIE", true),
 	})
 
 	runner := jobs.NewRunner(jobs.NewRunnerOptions{

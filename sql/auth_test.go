@@ -168,3 +168,58 @@ func TestDatabase_Login(t *testing.T) {
 		is.Nil(t, userID)
 	})
 }
+
+func TestDatabase_LoginWithEmail(t *testing.T) {
+	t.Run("creates token and job to send login email", func(t *testing.T) {
+		db := sqltest.CreateDatabase(t)
+
+		u := model.User{
+			Name:  "Me",
+			Email: "me@example.com",
+		}
+		err := db.Signup(context.Background(), &u)
+		is.NotError(t, err)
+
+		job, err := db.GetJob(context.Background())
+		is.NotError(t, err)
+		token1 := job.Payload["token"]
+
+		err = db.LoginWithEmail(context.Background(), "me@example.com")
+		is.NotError(t, err)
+
+		var token2 string
+		err = db.DB.Get(&token2, `select value from tokens where userID = ? and value != ?`, u.ID, token1)
+		is.NotError(t, err)
+
+		job, err = db.GetJob(context.Background())
+		is.NotError(t, err)
+		is.NotNil(t, job)
+		is.Equal(t, "send-email", job.Name)
+		is.Equal(t, "login", job.Payload["type"])
+		is.Equal(t, token2, job.Payload["token"])
+	})
+
+	t.Run("errors when user not found", func(t *testing.T) {
+		db := sqltest.CreateDatabase(t)
+
+		err := db.LoginWithEmail(context.Background(), "doesnotexist@example.com")
+		is.Error(t, model.ErrorUserNotFound, err)
+	})
+
+	t.Run("errors when user inactive", func(t *testing.T) {
+		db := sqltest.CreateDatabase(t)
+
+		u := model.User{
+			Name:  "Me",
+			Email: "me@example.com",
+		}
+		err := db.Signup(context.Background(), &u)
+		is.NotError(t, err)
+
+		_, err = db.DB.Exec(`update users set active = false where id = ?`, u.ID)
+		is.NotError(t, err)
+
+		err = db.LoginWithEmail(context.Background(), "me@example.com")
+		is.Error(t, model.ErrorUserInactive, err)
+	})
+}
