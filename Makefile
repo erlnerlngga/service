@@ -23,7 +23,6 @@ test:
 test-integration:
 	go test -coverprofile=cover.out -shuffle on ./...
 
-
 .PHONY: watch-css
 watch-css: tailwindcss
 	./tailwindcss -i tailwind.css -o public/styles/app.css --watch
