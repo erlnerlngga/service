@@ -33,11 +33,15 @@ func (s *Server) setupRoutes() {
 			r.Use(middleware.SetHeader("Content-Type", "text/html; charset=utf-8"))
 			r.Use(s.sm.LoadAndSave)
 
-			Signup(r, s.log, s.database)
-			Login(r, s.log, s.database, s.sm)
-			Logout(r, s.sm, s.log)
+			r.Group(func(r chi.Router) {
+				r.Use(Authenticate(false, s.sm, s.database, s.log))
 
-			Home(r)
+				Home(r)
+				Signup(r, s.log, s.database)
+				Login(r, s.log, s.database, s.sm)
+				Logout(r, s.sm, s.log)
+			})
+
 			Legal(r)
 			NotFound(r)
 		})

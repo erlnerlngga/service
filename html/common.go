@@ -59,6 +59,11 @@ func navbar(p PageProps) g.Node {
 				g.If(p.User == nil,
 					A(Href("/signup"), g.Text(`Sign up`)),
 				),
+				g.If(p.User != nil,
+					FormEl(Method("post"), Action("/logout"),
+						Button(Type("submit"), g.Text("Log out")),
+					),
+				),
 			),
 		),
 	)

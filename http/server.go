@@ -39,6 +39,7 @@ type NewServerOptions struct {
 	Metrics       *prometheus.Registry
 	ObjectStore   *s3.ObjectStore
 	Port          int
+	SecureCookie  bool
 }
 
 // NewServer returns an initialized, but unstarted Server.
@@ -58,7 +59,7 @@ func NewServer(opts NewServerOptions) *Server {
 	sm := scs.New()
 	sm.Store = sqlite3store.New(opts.Database.DB.DB)
 	sm.Lifetime = 365 * 24 * time.Hour
-	sm.Cookie.Secure = true
+	sm.Cookie.Secure = opts.SecureCookie
 
 	return &Server{
 		address:       address,

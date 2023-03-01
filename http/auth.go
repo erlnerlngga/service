@@ -97,6 +97,7 @@ func Signup(mux chi.Router, log *log.Logger, db signupper) {
 
 type loginner interface {
 	Login(ctx context.Context, token string) (*model.ID, error)
+	LoginWithEmail(ctx context.Context, email model.Email) error
 }
 
 type sessionPutter interface {
@@ -138,12 +139,26 @@ func Login(mux chi.Router, log *log.Logger, db loginner, sp sessionPutter) {
 		if token != "" {
 			return html.LoginTokenPage(html.PageProps{}, token), nil
 		}
-		return html.LoginPage(html.PageProps{}), nil
+		return html.LoginPage(html.PageProps{}, ""), nil
 	}))
 
 	mux.Post("/login/email", httph.FormHandler(func(w http.ResponseWriter, r *http.Request, req loginEmailRequest) {
-		// TODO
-		http.Redirect(w, r, "/login/email", http.StatusFound)
+		ghttp.Adapt(func(w http.ResponseWriter, r *http.Request) (g.Node, error) {
+			if err := db.LoginWithEmail(r.Context(), req.Email); err != nil {
+				switch {
+				case errors.Is(err, model.ErrorUserInactive):
+					return html.UserInactivePage(html.PageProps{}), nil
+				case errors.Is(err, model.ErrorUserNotFound):
+					return html.LoginPage(html.PageProps{}, req.Email.String()), nil
+				default:
+					log.Println("Error logging in with email:", err)
+					return html.ErrorPage(), err
+				}
+			}
+
+			http.Redirect(w, r, "/login/email", http.StatusFound)
+			return nil, nil
+		})(w, r)
 	}))
 
 	mux.Get("/login/email", ghttp.Adapt(func(w http.ResponseWriter, r *http.Request) (g.Node, error) {
@@ -166,6 +181,7 @@ func Login(mux chi.Router, log *log.Logger, db loginner, sp sessionPutter) {
 				case errors.Is(err, model.ErrorTokenExpired), errors.Is(err, model.ErrorTokenNotFound):
 					return html.TokenExpiredPage(html.PageProps{}), nil
 				default:
+					log.Println("Error logging in with token:", err)
 					return html.ErrorPage(), err
 				}
 			}
@@ -200,4 +216,62 @@ func Logout(mux chi.Router, s sessionDestroyer, log *log.Logger) {
 		http.Redirect(w, r, "/", http.StatusFound)
 		return nil, nil
 	}))
+}
+
+type sessionGetter interface {
+	sessionDestroyer
+	Exists(ctx context.Context, key string) bool
+	GetString(ctx context.Context, key string) string
+}
+
+type userGetter interface {
+	GetUser(ctx context.Context, id model.ID) (*model.User, error)
+}
+
+// Authenticate checks that there's a user logged in, and otherwise either:
+// - redirects to the login page,
+// - or calls the next handler
+// depending on the passed parameter.
+func Authenticate(redirect bool, sg sessionGetter, db userGetter, log *log.Logger) Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if !sg.Exists(r.Context(), sessionUserIDKey) {
+				if redirect {
+					http.Redirect(w, r, "/login", http.StatusFound)
+					return
+				}
+
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			userID := model.ID(sg.GetString(r.Context(), sessionUserIDKey))
+			user, err := db.GetUser(r.Context(), userID)
+			if err != nil || user == nil {
+				log.Println("Error getting user after authentication:", err, user)
+				http.Error(w, "error getting user after authentication", http.StatusInternalServerError)
+				return
+			}
+
+			if !user.Active {
+				if err := sg.Destroy(r.Context()); err != nil {
+					log.Println("Error destroying session for inactive user:", err, user.ID)
+					http.Error(w, "error after authentication", http.StatusInternalServerError)
+					return
+				}
+
+				if redirect {
+					http.Redirect(w, r, "/login", http.StatusFound)
+					return
+				}
+
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			// We store the user directly in the context instead of having to use the session manager
+			ctx := context.WithValue(r.Context(), contextUserKey, user)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
 }

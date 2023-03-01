@@ -115,12 +115,66 @@ func (d *Database) Login(ctx context.Context, token string) (*model.ID, error) {
 	return &userID, nil
 }
 
+// LoginWithEmail checks whether the user exists and is active, creates a login token, and creates a job to send
+// an email with the token in it.
+func (d *Database) LoginWithEmail(ctx context.Context, email model.Email) error {
+	return d.inTransaction(ctx, func(tx *sqlx.Tx) error {
+		var exists bool
+		query := `select exists (select 1 from users where email = ?)`
+		if err := tx.GetContext(ctx, &exists, query, email); err != nil {
+			return err
+		}
+		if !exists {
+			return model.ErrorUserNotFound
+		}
+
+		var inactive bool
+		query = `select exists (select 1 from users where email = ? and not active)`
+		if err := tx.GetContext(ctx, &inactive, query, email); err != nil {
+			return err
+		}
+		if inactive {
+			return model.ErrorUserInactive
+		}
+
+		token, err := createToken()
+		if err != nil {
+			return err
+		}
+		query = `insert into tokens (value, userID) values (?, (select id from users where email = ?))`
+		if _, err := tx.ExecContext(ctx, query, token, email); err != nil {
+			return errors.Wrap(err, "error creating token")
+		}
+
+		m := model.Map{
+			"type":  "login",
+			"token": token,
+		}
+		if err := d.createJobInTx(ctx, tx, "send-email", m, 10*time.Second); err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
 func (d *Database) GetUserFromToken(ctx context.Context, token string) (*model.User, error) {
 	var u model.User
 	query := `select users.* from users join tokens on tokens.userID = users.id where tokens.value = ?`
 	if err := d.DB.GetContext(ctx, &u, query, token); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
+		}
+		return nil, err
+	}
+	return &u, nil
+}
+
+func (d *Database) GetUser(ctx context.Context, id model.ID) (*model.User, error) {
+	var u model.User
+	if err := d.DB.GetContext(ctx, &u, `select * from users where id = ?`, id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model.ErrorUserNotFound
 		}
 		return nil, err
 	}

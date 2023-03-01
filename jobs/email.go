@@ -11,6 +11,7 @@ import (
 
 type emailSender interface {
 	SendSignupEmail(ctx context.Context, name string, email model.Email, token string) error
+	SendLoginEmail(ctx context.Context, name string, email model.Email, token string) error
 }
 
 type emailInfoGetter interface {
@@ -29,6 +30,15 @@ func SendEmail(r registry, log *log.Logger, e emailSender, db emailInfoGetter) {
 				return nil
 			}
 			return e.SendSignupEmail(ctx, user.Name, user.Email, m["token"])
+		case "login":
+			user, err := db.GetUserFromToken(ctx, m["token"])
+			if err != nil {
+				return errors.Wrap(err, `error getting user from token "%v"`, m["token"])
+			}
+			if user == nil {
+				return nil
+			}
+			return e.SendLoginEmail(ctx, user.Name, user.Email, m["token"])
 		default:
 			return errors.Newf(`unknown email type "%v"`, m["type"])
 		}
