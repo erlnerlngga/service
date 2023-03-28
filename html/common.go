@@ -42,19 +42,24 @@ func page(p PageProps, body ...g.Node) g.Node {
 			favIcons(),
 			openGraph(p.Title, p.Description, "/images/logo.png", ""),
 		},
-		Body: []g.Node{Class("h-full bg-gray-50"),
-			navbar(p),
-			container(true,
-				g.Group(body),
+		Body: []g.Node{Class("bg-gradient-to-b from-gray-100 to-gray-50 bg-no-repeat"),
+			Div(Class("min-h-screen flex flex-col justify-between"),
+				Div(
+					navbar(p),
+					container(true,
+						g.Group(body),
+					),
+				),
+				footer(),
 			),
 		},
 	})
 }
 
 func navbar(p PageProps) g.Node {
-	return Div(
+	return Div(Class("bg-cyan-600 shadow text-white"),
 		container(false,
-			Div(Class("flex justify-between py-2"),
+			Div(Class("flex items-center justify-between py-2"),
 				A(Href("/"), g.Text(`Home`)),
 				g.If(p.User == nil,
 					A(Href("/signup"), g.Text(`Sign up`)),
@@ -66,6 +71,26 @@ func navbar(p PageProps) g.Node {
 				),
 			),
 		),
+	)
+}
+
+func footer() g.Node {
+	return Div(Class("text-center py-4"),
+		Nav(Aria("label", "footer"), Class("flex flex-wrap justify-center space-x-4"),
+			footerLink("Help?!", "mailto:support@maragu.dk"),
+			footerLink(`Terms`, "/legal/terms-of-service"),
+			footerLink("Privacy", "/legal/privacy-policy"),
+			footerLink("Status", "https://status.maragu.dk"),
+		),
+		P(Class("mt-4 text-gray-500"), g.Raw(`Made in 🇩🇰 by <a class="text-gray-500 hover:text-gray-400" href="https://www.maragu.dk">maragu</a>`)),
+	)
+}
+
+func footerLink(name, href string) g.Node {
+	return A(
+		Class("text-gray-500 hover:text-gray-400"),
+		Href(href),
+		g.Text(name),
 	)
 }
 
