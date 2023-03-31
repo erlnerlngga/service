@@ -1,8 +1,9 @@
 # fly.toml file generated for service1 on 2023-02-01T14:21:55+01:00
 
-app = "service1"
+app = "service2"
 kill_signal = "SIGINT"
 kill_timeout = 5
+primary_region = "arn"
 processes = []
 
 [env]
