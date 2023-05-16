@@ -23,7 +23,7 @@ RUN set -x && apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 ADD litefs.yml /etc/litefs.yml
-COPY --from=flyio/litefs:0.3.0 /usr/local/bin/litefs ./
+COPY --from=flyio/litefs:0.4 /usr/local/bin/litefs ./
 
 COPY public ./public/
 COPY --from=builder /src/app.css ./public/styles/

@@ -6,19 +6,21 @@ kill_timeout = 5
 processes = []
 
 [env]
-  DATABASE_URL = "/data/app.db"
+  DATABASE_URL = "/litefs/app.db"
+  HOST = "localhost"
+  PORT = 8081
+  PRIMARY_REGION = "arn"
 
 [experimental]
   allowed_public_ports = []
   auto_rollback = true
-  enable_consul = true
 
 [metrics]
   path = "/metrics"
   port = 8080
 
 [mounts]
-  destination = "/mnt/data"
+  destination = "/data"
   source = "data"
 
 [[services]]
