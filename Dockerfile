@@ -15,11 +15,11 @@ RUN ./tailwindcss -i tailwind.css -o app.css --minify
 FROM debian:bullseye-slim AS runner
 WORKDIR /app
 
-RUN mkdir -p /data /mnt/data
+RUN mkdir -p /data /litefs
 
 RUN echo "deb http://deb.debian.org/debian bookworm main" >>/etc/apt/sources.list
 RUN set -x && apt-get update && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates/bullseye sqlite3/bookworm fuse/bullseye && \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates/bullseye sqlite3/bookworm fuse3/bullseye && \
   rm -rf /var/lib/apt/lists/*
 
 ADD litefs.yml /etc/litefs.yml
