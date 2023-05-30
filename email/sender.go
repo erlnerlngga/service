@@ -148,6 +148,7 @@ func (s *Sender) send(ctx context.Context, typ emailType, to nameAndEmail, subje
 	err := s.sendRequest(ctx, requestBody{
 		MessageStream: messageStream,
 		From:          from,
+		ReplyTo:       s.replyTo,
 		To:            to,
 		Subject:       subject,
 		HtmlBody:      getEmail(template+".html", preheader, keywords),
