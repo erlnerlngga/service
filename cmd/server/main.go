@@ -85,11 +85,15 @@ func start() int {
 		return 1
 	}
 
-	bucket := s3.NewBucket(s3.NewBucketOptions{
-		Config:    awsConfig,
-		Name:      env.GetStringOrDefault("S3_BUCKET_NAME", ""),
-		PathStyle: env.GetBoolOrDefault("S3_PATH_STYLE", false),
-	})
+	var bucket *s3.Bucket
+	bucketName := env.GetStringOrDefault("S3_BUCKET_NAME", "")
+	if bucketName != "" {
+		bucket = s3.NewBucket(s3.NewBucketOptions{
+			Config:    awsConfig,
+			Name:      env.GetStringOrDefault("S3_BUCKET_NAME", ""),
+			PathStyle: env.GetBoolOrDefault("S3_PATH_STYLE", false),
+		})
+	}
 
 	emailSender := email.NewSender(email.NewSenderOptions{
 		BaseURL:                   env.GetStringOrDefault("BASE_URL", "http://localhost:8080"),
