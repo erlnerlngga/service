@@ -13,31 +13,31 @@ import (
 	"github.com/alexedwards/scs/sqlite3store"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
+	"github.com/maragudk/aws/s3"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/maragudk/service/s3"
 	"github.com/maragudk/service/sql"
 )
 
 type Server struct {
 	address       string
 	adminPassword string
+	bucket        *s3.Bucket
 	database      *sql.Database
 	log           *log.Logger
 	metrics       *prometheus.Registry
 	mux           chi.Router
-	objectStore   *s3.ObjectStore
 	server        *http.Server
 	sm            *scs.SessionManager
 }
 
 type NewServerOptions struct {
 	AdminPassword string
+	Bucket        *s3.Bucket
 	Database      *sql.Database
 	Host          string
 	Log           *log.Logger
 	Metrics       *prometheus.Registry
-	ObjectStore   *s3.ObjectStore
 	Port          int
 	SecureCookie  bool
 }
@@ -64,11 +64,11 @@ func NewServer(opts NewServerOptions) *Server {
 	return &Server{
 		address:       address,
 		adminPassword: opts.AdminPassword,
+		bucket:        opts.Bucket,
 		database:      opts.Database,
 		log:           opts.Log,
 		metrics:       opts.Metrics,
 		mux:           mux,
-		objectStore:   opts.ObjectStore,
 		server: &http.Server{
 			Addr:              address,
 			Handler:           mux,

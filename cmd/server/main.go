@@ -13,6 +13,7 @@ import (
 	awss3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/smithy-go/logging"
 	"github.com/honeybadger-io/honeybadger-go"
+	"github.com/maragudk/aws/s3"
 	"github.com/maragudk/env"
 	"github.com/maragudk/errors"
 	"github.com/prometheus/client_golang/prometheus"
@@ -22,7 +23,6 @@ import (
 	"github.com/maragudk/service/email"
 	"github.com/maragudk/service/http"
 	"github.com/maragudk/service/jobs"
-	"github.com/maragudk/service/s3"
 	"github.com/maragudk/service/sql"
 )
 
@@ -85,9 +85,10 @@ func start() int {
 		return 1
 	}
 
-	objectStore := s3.NewObjectStore(s3.NewObjectStoreOptions{
-		Config: awsConfig,
-		Log:    log,
+	bucket := s3.NewBucket(s3.NewBucketOptions{
+		Config:    awsConfig,
+		Name:      env.GetStringOrDefault("S3_BUCKET_NAME", ""),
+		PathStyle: env.GetBoolOrDefault("S3_PATH_STYLE", false),
 	})
 
 	emailSender := email.NewSender(email.NewSenderOptions{
@@ -109,7 +110,7 @@ func start() int {
 		Host:          env.GetStringOrDefault("HOST", ""),
 		Log:           log,
 		Metrics:       registry,
-		ObjectStore:   objectStore,
+		Bucket:        bucket,
 		Port:          env.GetIntOrDefault("PORT", 8080),
 		SecureCookie:  env.GetBoolOrDefault("SECURE_COOKIE", true),
 	})
