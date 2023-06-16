@@ -9,11 +9,11 @@ processes = []
   DATABASE_URL = "/litefs/app.db"
   HOST = "localhost"
   PORT = 8081
-  PRIMARY_REGION = "arn"
 
 [experimental]
   allowed_public_ports = []
   auto_rollback = true
+  enable_consul = true
 
 [metrics]
   path = "/metrics"
