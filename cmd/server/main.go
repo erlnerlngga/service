@@ -90,7 +90,7 @@ func start() int {
 	if bucketName != "" {
 		bucket = s3.NewBucket(s3.NewBucketOptions{
 			Config:    awsConfig,
-			Name:      env.GetStringOrDefault("S3_BUCKET_NAME", ""),
+			Name:      bucketName,
 			PathStyle: env.GetBoolOrDefault("S3_PATH_STYLE", false),
 		})
 	}
