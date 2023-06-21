@@ -13,9 +13,10 @@ require (
 	github.com/honeybadger-io/honeybadger-go v0.5.0
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/maragudk/aws v0.1.0
+	github.com/maragudk/dblens v0.1.1
 	github.com/maragudk/env v0.1.2
 	github.com/maragudk/errors v0.1.1
-	github.com/maragudk/gomponents v0.20.0
+	github.com/maragudk/gomponents v0.20.1
 	github.com/maragudk/gomponents-heroicons/v2 v2.0.0-beta1
 	github.com/maragudk/httph v0.2.1
 	github.com/maragudk/is v0.1.0
@@ -47,6 +48,7 @@ require (
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/maragudk/gomponents-htmx v0.3.0 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pborman/uuid v1.2.1 // indirect

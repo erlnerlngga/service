@@ -4,6 +4,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/honeybadger-io/honeybadger-go"
+	"github.com/maragudk/dblens"
 	"github.com/maragudk/httph"
 )
 
@@ -50,6 +51,7 @@ func (s *Server) setupRoutes() {
 			r.Use(middleware.BasicAuth("admin", map[string]string{"admin": s.adminPassword}))
 
 			Migrate(r, s.database)
+			r.Get("/dblens", dblens.Handler(s.database.DB.DB, "sqlite3"))
 		})
 	})
 }
